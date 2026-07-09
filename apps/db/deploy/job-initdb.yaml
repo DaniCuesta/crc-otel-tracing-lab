@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-initdb
+  namespace: otel-lab
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: initdb
+          image: registry.redhat.io/rhel9/postgresql-17
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Esperando a PostgreSQL..."
+              until pg_isready -h postgres -p 5432 -U "$POSTGRESQL_USER"; do
+                sleep 2
+              done
+
+              echo "PostgreSQL disponible. Ejecutando init.sql..."
+              psql \
+                -h postgres \
+                -U "$POSTGRESQL_USER" \
+                -d "$POSTGRESQL_DATABASE" \
+                -f /initdb/init.sql
+
+              echo "Inicialización finalizada."
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRESQL_PASSWORD
+          volumeMounts:
+            - name: initdb
+              mountPath: /initdb
+      volumes:
+        - name: initdb
+          configMap:
+            name: postgres-initdb
