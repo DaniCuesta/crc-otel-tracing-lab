@@ -9,7 +9,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: initdb
-          image: rregistry.redhat.io/rhel8/postgresql-16
+          image: registry.redhat.io/rhel8/postgresql-16
           command:
             - /bin/bash
             - -c
