@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres
   namespace: otel-lab
   labels:
     app: postgres
 spec:
+  serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
@@ -17,11 +18,11 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: registry.redhat.io/rhel8/postgresql-16
+          image: registry.redhat.io/rhel9/postgresql-17
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5432
-              name: postgres
+            - name: postgres
+              containerPort: 5432
           envFrom:
             - secretRef:
                 name: postgres-secret
@@ -34,13 +35,13 @@ spec:
               memory: 256Mi
           volumeMounts:
             - name: postgres-data
-              mountPath: /var/lib/postgresql/data
-            - name: postgres-initdb
-              mountPath: /docker-entrypoint-initdb.d
-      volumes:
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: postgres-data
-        - name: postgres-initdb
-          configMap:
-            name: postgres-initdb
+              mountPath: /var/lib/pgsql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Mi
