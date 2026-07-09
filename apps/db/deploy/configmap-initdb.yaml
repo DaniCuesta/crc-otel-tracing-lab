@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+  namespace: otel-lab
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      category VARCHAR(50) NOT NULL,
+      description TEXT,
+      price NUMERIC(10,2) NOT NULL,
+      stock INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    INSERT INTO products (name, category, description, price, stock) VALUES
+    ('Laptop Pro 14', 'computing', 'Portable laptop for development and observability demos', 1299.99, 12),
+    ('Mechanical Keyboard', 'accessories', 'Keyboard with tactile switches for daily work', 129.90, 35),
+    ('Wireless Mouse', 'accessories', 'Ergonomic wireless mouse', 49.99, 80),
+    ('QHD Monitor 32', 'displays', '32 inch QHD monitor for dashboards and development', 329.00, 9),
+    ('USB-C Dock', 'accessories', 'Docking station with HDMI, Ethernet and USB ports', 89.50, 22),
+    ('Noise Cancelling Headset', 'audio', 'Headset for meetings and focused work', 159.00, 18),
+    ('Webcam Full HD', 'video', '1080p webcam for remote calls', 69.99, 27),
+    ('External SSD 1TB', 'storage', 'Fast external SSD for backups and labs', 119.99, 16),
+    ('NAS Drive 4TB', 'storage', 'Reliable storage disk for local backups', 149.99, 10),
+    ('Mini Server Node', 'computing', 'Small server for home lab workloads', 599.00, 5),
+    ('Ethernet Adapter', 'networking', 'USB-C to Ethernet adapter', 24.99, 40),
+    ('WiFi 6 Router', 'networking', 'Router suitable for lab environments', 179.99, 7),
+    ('HDMI Cable', 'accessories', 'High speed HDMI cable', 12.99, 100),
+    ('Laptop Stand', 'accessories', 'Aluminium stand for ergonomic desk setup', 39.99, 45),
+    ('Power Bank 20000mAh', 'power', 'Portable battery for devices', 59.99, 30),
+    ('Smart Plug', 'iot', 'WiFi smart plug for automation tests', 19.99, 65),
+    ('Raspberry Pi Kit', 'computing', 'Single board computer kit for experiments', 99.99, 14),
+    ('Temperature Sensor', 'iot', 'Sensor for monitoring lab temperature', 14.50, 90),
+    ('Grafana Mug', 'merch', 'Mug for observability engineers', 11.99, 50),
+    ('OpenTelemetry Sticker Pack', 'merch', 'Sticker pack for tracing lovers', 4.99, 200)
+    ON CONFLICT DO NOTHING;
