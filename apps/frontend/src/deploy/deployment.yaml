@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: otel-lab
+  labels:
+    app: frontend
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: otel-tracing-lab
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: otel-tracing-lab
+
+    spec:
+      imagePullSecrets:
+        - name: quay-pull-secret
+
+      containers:
+        - name: frontend
+          image: quay.io/danielcuestam/otel-lab:frontendv2
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          env:
+            - name: BACKEND_URL
+              value: "http://backend:8080"
+
+            - name: BACKEND_TIMEOUT
+              value: "10"
+
+            - name: OTEL_SERVICE_NAME
+              value: "frontend"
+
+            - name: OTEL_SERVICE_NAMESPACE
+              value: "otel-lab"
+
+            - name: OTEL_DEPLOYMENT_ENVIRONMENT
+              value: "crc"
+
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4318"
+
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "http/protobuf"
+
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+
+            - name: OTEL_PROPAGATORS
+              value: "tracecontext,baggage"
+
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
