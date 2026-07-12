@@ -23,6 +23,8 @@ spec:
           ports:
             - name: postgres
               containerPort: 5432
+              protocol: TCP
+
           envFrom:
             - secretRef:
                 name: postgres-secret
@@ -36,12 +38,7 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/pgsql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 100Mi
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data

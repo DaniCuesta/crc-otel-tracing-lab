@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: otel-lab
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: crc-csi-hostpath-provisioner
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Mi
