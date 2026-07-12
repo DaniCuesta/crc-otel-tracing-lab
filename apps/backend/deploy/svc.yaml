@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: otel-lab
+  labels:
+    app: backend
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: otel-tracing-lab
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: backend
+
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
