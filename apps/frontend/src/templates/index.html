@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>OTel Demo Shop</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='/style.css') }}"
+    >
+</head>
+
+<body>
+    <main class="container">
+
+        <header class="hero">
+            <div class="hero-content">
+
+                <span class="eyebrow">
+                    CRC · OpenShift · OpenTelemetry
+                </span>
+
+                <h1>OTel Demo Shop</h1>
+
+                <p class="hero-description">
+                    Laboratorio para probar trazas distribuidas,
+                    errores, latencias y consultas SQL.
+                </p>
+
+                <div class="hero-meta">
+
+                    <span class="status">
+                        <span class="status-dot"></span>
+                        Frontend activo
+                    </span>
+
+                    <span class="backend-info">
+                        Backend configurado
+                    </span>
+
+                </div>
+            </div>
+        </header>
+
+        <section class="card">
+
+            <div class="section-heading">
+
+                <span class="section-label">
+                    Pruebas
+                </span>
+
+                <h2>Escenarios del laboratorio</h2>
+
+                <p>
+                    Ejecuta distintos flujos para analizar después
+                    su comportamiento en los logs y en Jaeger.
+                </p>
+
+            </div>
+
+            <div class="actions">
+
+                <a
+                    class="scenario-button normal"
+                    href="/scenario/normal"
+                >
+                    <span class="scenario-number">
+                        01
+                    </span>
+
+                    <span>
+                        <strong>Petición normal</strong>
+                        <small>Consulta correcta al backend</small>
+                    </span>
+                </a>
+
+                <a
+                    class="scenario-button latency"
+                    href="/scenario/latency"
+                >
+                    <span class="scenario-number">
+                        02
+                    </span>
+
+                    <span>
+                        <strong>Simular latencia</strong>
+                        <small>Respuesta deliberadamente lenta</small>
+                    </span>
+                </a>
+
+                <a
+                    class="scenario-button error"
+                    href="/scenario/error"
+                >
+                    <span class="scenario-number">
+                        03
+                    </span>
+
+                    <span>
+                        <strong>Simular error</strong>
+                        <small>Error controlado del backend</small>
+                    </span>
+                </a>
+
+                <a
+                    class="scenario-button sql-error"
+                    href="/scenario/sql-error"
+                >
+                    <span class="scenario-number">
+                        04
+                    </span>
+
+                    <span>
+                        <strong>Error SQL</strong>
+                        <small>Consulta inválida a PostgreSQL</small>
+                    </span>
+                </a>
+
+            </div>
+        </section>
+
+        {% if error %}
+        <section class="alert error-alert">
+
+            <div class="alert-icon">
+                !
+            </div>
+
+            <div>
+                <h3>No ha sido posible completar la operación</h3>
+
+                <p>
+                    {{ error }}
+                </p>
+            </div>
+
+        </section>
+        {% endif %}
+
+        {% if success_message %}
+        <section class="alert success-alert">
+
+            <div class="alert-icon">
+                ✓
+            </div>
+
+            <div>
+                <h3>Operación completada</h3>
+
+                <p>
+                    {{ success_message }}
+                </p>
+            </div>
+
+        </section>
+        {% endif %}
+
+        {% if scenario_result %}
+        <section class="card">
+
+            <div class="section-heading">
+
+                <span class="section-label">
+                    Resultado
+                </span>
+
+                <h2>Respuesta del escenario</h2>
+
+                <p>
+                    Respuesta obtenida desde el backend.
+                </p>
+
+            </div>
+
+            <pre class="result-box">{{ scenario_result | tojson(indent=2) }}</pre>
+
+        </section>
+        {% endif %}
+
+        <section class="card">
+
+            <div class="section-heading products-heading">
+
+                <div>
+                    <span class="section-label">
+                        Catálogo
+                    </span>
+
+                    <h2>Productos disponibles</h2>
+
+                    <p>
+                        Información recuperada mediante una llamada HTTP al backend.
+                    </p>
+                </div>
+
+                <span class="counter">
+                    {{ products | length }} productos
+                </span>
+
+            </div>
+
+            {% if products %}
+            <div class="products">
+
+                {% for product in products %}
+                <article class="product">
+
+                    <span class="category">
+                        {{ product.category }}
+                    </span>
+
+                    <h3>
+                        {{ product.name }}
+                    </h3>
+
+                    <p class="description">
+                        {{ product.description }}
+                    </p>
+
+                    <div class="product-footer">
+
+                        <strong>
+                            {{ "%.2f"|format(product.price) }} €
+                        </strong>
+
+                        <span>
+                            Stock: {{ product.stock }}
+                        </span>
+
+                    </div>
+
+                </article>
+                {% endfor %}
+
+            </div>
+            {% else %}
+            <div class="empty">
+                No hay productos disponibles.
+            </div>
+            {% endif %}
+
+        </section>
+
+        <footer class="footer">
+
+            <span>
+                CRC OpenTelemetry Tracing Lab
+            </span>
+
+            <span>
+                Backend:
+                <code>{{ backend_url }}</code>
+            </span>
+
+        </footer>
+
+    </main>
+</body>
+</html>
